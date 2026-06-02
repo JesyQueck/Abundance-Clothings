@@ -9,6 +9,7 @@ import { getOrders, updateOrderStatus } from "@/lib/db";
 import { Order, OrderStatus } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { Eye, Edit, Save, X } from "lucide-react";
+import Image from "next/image";
 
 const OrderStatusColors: Record<OrderStatus, string> = {
   Received: "blue",
@@ -190,18 +191,17 @@ const AdminOrdersPage = () => {
                 <strong>Customer Name:</strong> {selectedOrder.customerName}
               </p>
               <p>
-                <strong>Phone:</strong> {selectedOrder.phoneNumber}
+                <strong>Phone:</strong> {selectedOrder.phone}
               </p>
               <p>
                 <strong>Email:</strong> {selectedOrder.email || "N/A"}
               </p>
               <p>
-                <strong>Address:</strong> {selectedOrder.deliveryAddress},{" "}
+                <strong>Address:</strong> {selectedOrder.address},{" "}
                 {selectedOrder.city}, {selectedOrder.state}
               </p>
               <p>
-                <strong>Order Notes:</strong>{" "}
-                {selectedOrder.orderNotes || "N/A"}
+                <strong>Order Notes:</strong> {selectedOrder.notes || "N/A"}
               </p>
               <p>
                 <strong>Total:</strong> ₦{formatPrice(selectedOrder.total)}

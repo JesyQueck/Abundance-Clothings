@@ -2,7 +2,12 @@ export type Category = "mens" | "womens" | "accessories";
 
 export type Size = "XS" | "S" | "M" | "L" | "XL" | "XXL";
 
-export type OrderStatus = "Received" | "Processing" | "Packed" | "Shipped" | "Delivered";
+export type OrderStatus =
+  | "Received"
+  | "Processing"
+  | "Packed"
+  | "Shipped"
+  | "Delivered";
 
 export interface ProductVariant {
   size: Size;
@@ -53,11 +58,12 @@ export interface Coupon {
 export interface Order {
   id: string;
   customerName: string;
-  phone: string;
+  phoneNumber: string;
   email?: string;
-  address: string;
+  deliveryAddress: string;
   state: string;
-  notes?: string;
+  city: string;
+  orderNotes?: string;
   items: CartItem[];
   subtotal: number;
   discount: number;
