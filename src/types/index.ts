@@ -2,6 +2,8 @@ export type Category = "mens" | "womens" | "accessories";
 
 export type Size = "XS" | "S" | "M" | "L" | "XL" | "XXL";
 
+export type OrderStatus = "Received" | "Processing" | "Packed" | "Shipped" | "Delivered";
+
 export interface ProductVariant {
   size: Size;
   color: string;

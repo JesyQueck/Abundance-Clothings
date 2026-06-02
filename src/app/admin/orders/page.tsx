@@ -138,8 +138,8 @@ const AdminOrdersPage = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center">
                     {editingOrderId === order.id ? (
                       <Button
-                        variant="ghost"
-                        size="small"
+                        variant="outline"
+                        size="sm"
                         onClick={handleSaveStatus}
                         className="text-green-500 hover:text-white mr-2"
                       >
@@ -147,8 +147,8 @@ const AdminOrdersPage = () => {
                       </Button>
                     ) : (
                       <Button
-                        variant="ghost"
-                        size="small"
+                        variant="outline"
+                        size="sm"
                         onClick={() => handleEditStatus(order)}
                         className="text-gold-primary hover:text-white mr-2"
                       >
@@ -156,8 +156,8 @@ const AdminOrdersPage = () => {
                       </Button>
                     )}
                     <Button
-                      variant="ghost"
-                      size="small"
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleViewOrder(order)}
                       className="text-blue-500 hover:text-white"
                     >
@@ -175,8 +175,8 @@ const AdminOrdersPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
             <Button
-              variant="icon"
-              size="small"
+              variant="outline"
+              size="sm"
               className="absolute top-4 right-4 text-text-secondary hover:text-white"
               onClick={() => setModalOpen(false)}
             >
