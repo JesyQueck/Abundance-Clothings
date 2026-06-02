@@ -191,17 +191,18 @@ const AdminOrdersPage = () => {
                 <strong>Customer Name:</strong> {selectedOrder.customerName}
               </p>
               <p>
-                <strong>Phone:</strong> {selectedOrder.phone}
+                <strong>Phone:</strong> {selectedOrder.phoneNumber}
               </p>
               <p>
                 <strong>Email:</strong> {selectedOrder.email || "N/A"}
               </p>
               <p>
-                <strong>Address:</strong> {selectedOrder.address},{" "}
+                <strong>Address:</strong> {selectedOrder.deliveryAddress},{" "}
                 {selectedOrder.city}, {selectedOrder.state}
               </p>
               <p>
-                <strong>Order Notes:</strong> {selectedOrder.notes || "N/A"}
+                <strong>Order Notes:</strong>{" "}
+                {selectedOrder.orderNotes || "N/A"}
               </p>
               <p>
                 <strong>Total:</strong> ₦{formatPrice(selectedOrder.total)}
