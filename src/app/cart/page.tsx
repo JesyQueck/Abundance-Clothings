@@ -7,7 +7,17 @@ import { useCart } from "@/context/CartContext";
 import { Trash2, Plus, Minus } from "lucide-react";
 
 export default function CartPage() {
-  const { items, updateQuantity, removeItem, subtotal, discount, total, applyCoupon, couponCode, clearCoupon } = useCart();
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    subtotal,
+    discount,
+    total,
+    applyCoupon,
+    couponCode,
+    removeCoupon,
+  } = useCart();
 
   const handleApplyCoupon = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,7 +53,10 @@ export default function CartPage() {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
-              <div key={`${item.productId}-${item.size}-${item.color}`} className="bg-background-raised border border-border-subtle p-4 flex gap-4">
+              <div
+                key={`${item.productId}-${item.size}-${item.color}`}
+                className="bg-background-raised border border-border-subtle p-4 flex gap-4"
+              >
                 <div className="w-24 h-24 flex-shrink-0">
                   <img
                     src={item.image}
@@ -64,14 +77,28 @@ export default function CartPage() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => updateQuantity(item.productId, item.size, item.color, Math.max(1, item.quantity - 1))}
+                        onClick={() =>
+                          updateQuantity(
+                            item.productId,
+                            item.size,
+                            item.color,
+                            Math.max(1, item.quantity - 1),
+                          )
+                        }
                         className="w-8 h-8 bg-background-surface border border-border-subtle flex items-center justify-center hover:border-gold-primary transition-colors"
                       >
                         <Minus size={16} />
                       </button>
                       <span className="w-8 text-center">{item.quantity}</span>
                       <button
-                        onClick={() => updateQuantity(item.productId, item.size, item.color, item.quantity + 1)}
+                        onClick={() =>
+                          updateQuantity(
+                            item.productId,
+                            item.size,
+                            item.color,
+                            item.quantity + 1,
+                          )
+                        }
                         className="w-8 h-8 bg-background-surface border border-border-subtle flex items-center justify-center hover:border-gold-primary transition-colors"
                       >
                         <Plus size={16} />
@@ -127,7 +154,7 @@ export default function CartPage() {
               {couponCode && (
                 <button
                   type="button"
-                  onClick={clearCoupon}
+                  onClick={removeCoupon}
                   className="text-red-500 text-sm mt-2 hover:underline"
                 >
                   Remove coupon
@@ -144,7 +171,10 @@ export default function CartPage() {
               </Button>
             </Link>
 
-            <Link href="/shop" className="block text-center mt-4 text-text-secondary hover:text-gold-primary transition-colors text-sm">
+            <Link
+              href="/shop"
+              className="block text-center mt-4 text-text-secondary hover:text-gold-primary transition-colors text-sm"
+            >
               Continue Shopping
             </Link>
           </div>

@@ -1,7 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  ReactNode,
+} from "react";
 import { CartItem, Product, ProductVariant } from "@/types";
+import { getCouponByCode } from "@/lib/db";
 
 type CartState = {
   items: CartItem[];
@@ -13,24 +20,56 @@ type CartState = {
 type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem }
   | { type: "REMOVE_ITEM"; payload: string }
-  | { type: "UPDATE_QUANTITY"; payload: { productId: string; size: string; color: string; quantity: number } }
+  | {
+      type: "UPDATE_QUANTITY";
+      payload: {
+        productId: string;
+        size: string;
+        color: string;
+        quantity: number;
+      };
+    }
   | { type: "CLEAR_CART" }
   | { type: "APPLY_COUPON"; payload: { code: string; discount: number } }
   | { type: "REMOVE_COUPON" }
   | { type: "LOAD_CART"; payload: CartItem[] };
 
 interface CartContextType {
-  state: CartState;
-  addItem: (product: Product, variant: ProductVariant, quantity: number) => void;
+  items: CartItem[];
+  subtotal: number;
+  discount: number;
+  couponCode: string | null;
+  total: number;
+  addItem: (
+    product: Product,
+    variant: ProductVariant,
+    quantity: number,
+  ) => void;
   removeItem: (productId: string, size: string, color: string) => void;
-  updateQuantity: (productId: string, size: string, color: string, quantity: number) => void;
+  updateQuantity: (
+    productId: string,
+    size: string,
+    color: string,
+    quantity: number,
+  ) => void;
   clearCart: () => void;
-  applyCoupon: (code: string, discount: number) => void;
+  applyCoupon: (
+    code: string,
+  ) => Promise<{ success: boolean; message?: string }>;
+  applyCoupon: (
+    code: string,
+  ) => Promise<{ success: boolean; message?: string }>;
   removeCoupon: () => void;
   getItemCount: () => number;
+  getTotalPrice: () => number;
+  getDiscountAmount: () => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+function calculateDiscount(subtotal: number, discountValue: number): number {
+  return Math.round(subtotal * (discountValue / 100));
+}
 
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
@@ -39,7 +78,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         (item) =>
           item.productId === action.payload.productId &&
           item.size === action.payload.size &&
-          item.color === action.payload.color
+          item.color === action.payload.color,
       );
 
       let newItems: CartItem[];
@@ -47,24 +86,34 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         newItems = state.items.map((item, index) =>
           index === existingIndex
             ? { ...item, quantity: item.quantity + action.payload.quantity }
-            : item
+            : item,
         );
       } else {
         newItems = [...state.items, action.payload];
       }
 
-      const subtotal = newItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const discount = state.couponCode ? calculateDiscount(subtotal, state.discount) : 0;
+      const subtotal = newItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+      const discount = state.couponCode
+        ? calculateDiscount(subtotal, state.discount)
+        : 0;
 
       return { ...state, items: newItems, subtotal, discount };
     }
 
     case "REMOVE_ITEM": {
       const newItems = state.items.filter(
-        (item) => item.productId !== action.payload
+        (item) => item.productId !== action.payload,
       );
-      const subtotal = newItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const discount = state.couponCode ? calculateDiscount(subtotal, state.discount) : 0;
+      const subtotal = newItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+      const discount = state.couponCode
+        ? calculateDiscount(subtotal, state.discount)
+        : 0;
 
       return { ...state, items: newItems, subtotal, discount };
     }
@@ -75,10 +124,15 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         item.size === action.payload.size &&
         item.color === action.payload.color
           ? { ...item, quantity: action.payload.quantity }
-          : item
+          : item,
       );
-      const subtotal = newItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const discount = state.couponCode ? calculateDiscount(subtotal, state.discount) : 0;
+      const subtotal = newItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+      const discount = state.couponCode
+        ? calculateDiscount(subtotal, state.discount)
+        : 0;
 
       return { ...state, items: newItems, subtotal, discount };
     }
@@ -87,23 +141,30 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return { items: [], subtotal: 0, discount: 0, couponCode: null };
 
     case "APPLY_COUPON":
-      const discount = calculateDiscount(state.subtotal, action.payload.discount);
+      const discount = calculateDiscount(
+        state.subtotal,
+        action.payload.discount,
+      );
       return { ...state, couponCode: action.payload.code, discount };
 
     case "REMOVE_COUPON":
       return { ...state, couponCode: null, discount: 0 };
 
     case "LOAD_CART":
-      const loadedSubtotal = action.payload.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      return { items: action.payload, subtotal: loadedSubtotal, discount: 0, couponCode: null };
+      const loadedSubtotal = action.payload.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+      return {
+        items: action.payload,
+        subtotal: loadedSubtotal,
+        discount: 0,
+        couponCode: null,
+      };
 
     default:
       return state;
   }
-}
-
-function calculateDiscount(subtotal: number, discountValue: number): number {
-  return Math.round(subtotal * (discountValue / 100));
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -125,7 +186,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("abundance_cart", JSON.stringify(state.items));
   }, [state.items]);
 
-  const addItem = (product: Product, variant: ProductVariant, quantity: number) => {
+  const addItem = (
+    product: Product,
+    variant: ProductVariant,
+    quantity: number,
+  ) => {
     const cartItem: CartItem = {
       productId: product.id,
       slug: product.slug,
@@ -144,30 +209,49 @@ export function CartProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "REMOVE_ITEM", payload: productId });
   };
 
-  const updateQuantity = (productId: string, size: string, color: string, quantity: number) => {
-    dispatch({ type: "UPDATE_QUANTITY", payload: { productId, size, color, quantity } });
+  const updateQuantity = (
+    productId: string,
+    size: string,
+    color: string,
+    quantity: number,
+  ) => {
+    dispatch({
+      type: "UPDATE_QUANTITY",
+      payload: { productId, size, color, quantity },
+    });
   };
 
   const clearCart = () => {
     dispatch({ type: "CLEAR_CART" });
   };
 
-  const applyCoupon = (code: string, discount: number) => {
-    dispatch({ type: "APPLY_COUPON", payload: { code, discount } });
+  const applyCoupon = async (code: string) => {
+    const coupon = await getCouponByCode(code);
+    if (!coupon) return { success: false, message: "Invalid coupon" };
+    dispatch({
+      type: "APPLY_COUPON",
+      payload: { code: coupon.code, discount: coupon.value },
+    });
+    return { success: true };
   };
 
   const removeCoupon = () => {
     dispatch({ type: "REMOVE_COUPON" });
   };
 
-  const getItemCount = () => {
-    return state.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0);
-  };
+  const getItemCount = () =>
+    state.items.reduce((sum, item) => sum + item.quantity, 0);
+  const getTotalPrice = () => state.subtotal;
+  const getDiscountAmount = () => state.discount;
 
   return (
     <CartContext.Provider
       value={{
-        state,
+        items: state.items,
+        subtotal: state.subtotal,
+        discount: state.discount,
+        couponCode: state.couponCode,
+        total: state.subtotal - state.discount,
         addItem,
         removeItem,
         updateQuantity,
@@ -175,6 +259,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         applyCoupon,
         removeCoupon,
         getItemCount,
+        getTotalPrice,
+        getDiscountAmount,
       }}
     >
       {children}

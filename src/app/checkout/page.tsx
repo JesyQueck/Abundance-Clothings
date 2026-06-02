@@ -27,7 +27,15 @@ const checkoutSchema = z.object({
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutPage() {
-  const { cart, getItemCount, getTotalPrice, applyCoupon, removeCoupon, getDiscountAmount } = useCart();
+  const {
+    items,
+    getItemCount,
+    getTotalPrice,
+    applyCoupon,
+    removeCoupon,
+    getDiscountAmount,
+    couponCode,
+  } = useCart();
   const router = useRouter();
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState("");
@@ -41,7 +49,7 @@ export default function CheckoutPage() {
     resolver: zodResolver(checkoutSchema),
   });
 
-  if (cart.items.length === 0 && !orderPlaced) {
+  if (items.length === 0 && !orderPlaced) {
     return (
       <div className="container mx-auto px-4 py-16 text-center text-gold-primary">
         <h1 className="text-4xl font-bebas-neue mb-4">Your Cart is Empty</h1>
@@ -90,7 +98,7 @@ export default function CheckoutPage() {
     message += `Subtotal:   ₦${formatPrice(getTotalPrice())}\n`;
     const discount = getDiscountAmount();
     if (discount > 0) {
-      message += `Discount:   -₦${formatPrice(discount)} (${cart.coupon?.code || ""})\n`;
+      message += `Discount:   -₦${formatPrice(discount)} (${couponCode || ""})\n`;
     }
     message += `TOTAL:      ₦${formatPrice(getTotalPrice() - discount)}\n`;
     message += `─────────────────────\n\n`;
@@ -114,7 +122,8 @@ export default function CheckoutPage() {
       <div className="container mx-auto px-4 py-16 text-center text-gold-primary">
         <h1 className="text-4xl font-bebas-neue mb-4">Order Sent!</h1>
         <p className="text-lg text-text-secondary mb-8">
-          Your order has been sent to Abundance Clothing via WhatsApp. We'll contact you shortly to confirm.
+          Your order has been sent to Abundance Clothing via WhatsApp. We'll
+          contact you shortly to confirm.
         </p>
         <Link href="/shop">
           <Button variant="primary">Continue Shopping</Button>
@@ -129,7 +138,9 @@ export default function CheckoutPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bebas-neue text-gold-primary mb-8 text-center">Checkout</h1>
+      <h1 className="text-4xl font-bebas-neue text-gold-primary mb-8 text-center">
+        Checkout
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Checkout Form */}
@@ -195,10 +206,18 @@ export default function CheckoutPage() {
             Order Summary
           </h2>
           <Card accent>
-            {cart.items.map((item) => (
-              <div key={`${item.productId}-${item.size}-${item.color}`} className="flex items-center mb-4 last:mb-0">
+            {items.map((item) => (
+              <div
+                key={`${item.productId}-${item.size}-${item.color}`}
+                className="flex items-center mb-4 last:mb-0"
+              >
                 <div className="w-20 h-20 relative mr-4 flex-shrink-0">
-                  <Image src={item.image} alt={item.name} fill style={{ objectFit: "cover" }} />
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
                 </div>
                 <div className="flex-grow">
                   <h3 className="text-text-primary text-lg">{item.name}</h3>
@@ -217,27 +236,39 @@ export default function CheckoutPage() {
 
             <div className="border-t border-border-subtle mt-4 pt-4 text-sm font-mono space-y-2">
               <div className="flex justify-between">
-                <span className="text-text-secondary">Subtotal ({getItemCount()} items)</span>
-                <span className="text-text-primary">₦{formatPrice(subtotal)}</span>
+                <span className="text-text-secondary">
+                  Subtotal ({getItemCount()} items)
+                </span>
+                <span className="text-text-primary">
+                  ₦{formatPrice(subtotal)}
+                </span>
               </div>
-              {cart.coupon && (
+              {couponCode && (
                 <div className="flex justify-between text-gold-primary">
-                  <span>Discount ({cart.coupon.code})</span>
+                  <span>Discount ({couponCode})</span>
                   <span>-₦{formatPrice(discountAmount)}</span>
-                  <Button variant="ghost" onClick={removeCoupon} className="text-xs ml-2">
+                  <Button
+                    variant="outline"
+                    onClick={removeCoupon}
+                    className="text-xs ml-2"
+                  >
                     Remove
                   </Button>
                 </div>
               )}
               <div className="flex justify-between text-xl font-bold font-bebas-neue pt-2 border-t border-border-subtle">
                 <span className="text-gold-primary">Total</span>
-                <span className="text-gold-primary">₦{formatPrice(grandTotal)}</span>
+                <span className="text-gold-primary">
+                  ₦{formatPrice(grandTotal)}
+                </span>
               </div>
             </div>
           </Card>
 
           <div className="mt-6">
-            <h3 className="text-lg font-bebas-neue text-text-primary mb-3">Apply Coupon</h3>
+            <h3 className="text-lg font-bebas-neue text-text-primary mb-3">
+              Apply Coupon
+            </h3>
             <div className="flex gap-2">
               <Input
                 type="text"
@@ -246,7 +277,11 @@ export default function CheckoutPage() {
                 onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                 error={couponError}
               />
-              <Button variant="secondary" onClick={handleApplyCoupon} disabled={!couponCode}>
+              <Button
+                variant="secondary"
+                onClick={handleApplyCoupon}
+                disabled={!couponCode}
+              >
                 Apply
               </Button>
             </div>
@@ -254,11 +289,17 @@ export default function CheckoutPage() {
 
           <p className="text-text-secondary text-sm mt-6 mb-4 leading-relaxed">
             <em className="text-gold-primary">
-              "We're almost done! Click below to send your order to us on WhatsApp. We'll confirm
-              availability and payment details within a few hours."
+              "We're almost done! Click below to send your order to us on
+              WhatsApp. We'll confirm availability and payment details within a
+              few hours."
             </em>
           </p>
-          <Button variant="primary" size="large" className="w-full" onClick={handleSubmit(onSubmit)}>
+          <Button
+            variant="primary"
+            size="md"
+            className="w-full"
+            onClick={handleSubmit(onSubmit)}
+          >
             Send Order on WhatsApp →
           </Button>
         </div>
