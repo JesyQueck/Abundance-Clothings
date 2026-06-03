@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { SectionTitle, SubTitle, Bullet, Card } from "@/components/ui/PRDComponents";
-import { Input } from "@/components/ui/Input";
+import {
+  SectionTitle,
+  SubTitle,
+  Bullet,
+  Card,
+} from "@/components/ui/PRDComponents";
+import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,7 +48,8 @@ export default function ContactPage() {
     <div className="container mx-auto px-4 py-8 text-text-secondary">
       <SectionTitle>Get In Touch</SectionTitle>
       <p className="mb-8 text-lg leading-relaxed">
-        Have a question, feedback, or just want to say hello? Fill out the form below or reach us directly via WhatsApp.
+        Have a question, feedback, or just want to say hello? Fill out the form
+        below or reach us directly via WhatsApp.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -77,9 +83,8 @@ export default function ContactPage() {
                 {...register("subject")}
                 error={errors.subject?.message}
               />
-              <Input
+              <Textarea
                 label="Your Message"
-                type="textarea"
                 id="message"
                 rows={5}
                 {...register("message")}
@@ -96,16 +101,32 @@ export default function ContactPage() {
           <SubTitle>Other Ways to Connect</SubTitle>
           <Card accent>
             <Bullet>
-              <strong>WhatsApp:</strong> <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}`} target="_blank" rel="noopener noreferrer" className="text-gold-primary hover:underline">{process.env.NEXT_PUBLIC_WA_NUMBER || "+234 800 000 0000"}</a>
+              <strong>WhatsApp:</strong>{" "}
+              <a
+                href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gold-primary hover:underline"
+              >
+                {process.env.NEXT_PUBLIC_WA_NUMBER || "+234 800 000 0000"}
+              </a>
             </Bullet>
             <Bullet>
-              <strong>Email:</strong> <a href="mailto:info@abundanceclothing.com" className="text-gold-primary hover:underline">info@abundanceclothing.com</a>
+              <strong>Email:</strong>{" "}
+              <a
+                href="mailto:info@abundanceclothing.com"
+                className="text-gold-primary hover:underline"
+              >
+                info@abundanceclothing.com
+              </a>
             </Bullet>
             <Bullet>
-              <strong>Address:</strong> Lagos, Nigeria (Details for pickup provided on order confirmation)
+              <strong>Address:</strong> Lagos, Nigeria (Details for pickup
+              provided on order confirmation)
             </Bullet>
             <Bullet>
-              <strong>Social Media:</strong> Find us on Instagram and Twitter @AbundanceClothing
+              <strong>Social Media:</strong> Find us on Instagram and Twitter
+              @AbundanceClothing
             </Bullet>
           </Card>
 

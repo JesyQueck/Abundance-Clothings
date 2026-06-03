@@ -19,7 +19,10 @@ type CartState = {
 
 type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem }
-  | { type: "REMOVE_ITEM"; payload: string }
+  | {
+      type: "REMOVE_ITEM";
+      payload: { productId: string; size: string; color: string };
+    }
   | {
       type: "UPDATE_QUANTITY";
       payload: {
@@ -53,9 +56,6 @@ interface CartContextType {
     quantity: number,
   ) => void;
   clearCart: () => void;
-  applyCoupon: (
-    code: string,
-  ) => Promise<{ success: boolean; message?: string }>;
   applyCoupon: (
     code: string,
   ) => Promise<{ success: boolean; message?: string }>;
@@ -105,7 +105,12 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
     case "REMOVE_ITEM": {
       const newItems = state.items.filter(
-        (item) => item.productId !== action.payload,
+        (item) =>
+          !(
+            item.productId === action.payload.productId &&
+            item.size === action.payload.size &&
+            item.color === action.payload.color
+          ),
       );
       const subtotal = newItems.reduce(
         (sum, item) => sum + item.price * item.quantity,
@@ -206,7 +211,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const removeItem = (productId: string, size: string, color: string) => {
-    dispatch({ type: "REMOVE_ITEM", payload: productId });
+    dispatch({ type: "REMOVE_ITEM", payload: { productId, size, color } });
   };
 
   const updateQuantity = (

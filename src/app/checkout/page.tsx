@@ -34,10 +34,10 @@ export default function CheckoutPage() {
     applyCoupon,
     removeCoupon,
     getDiscountAmount,
-    couponCode,
+    couponCode: contextCouponCode,
   } = useCart();
   const router = useRouter();
-  const [couponCode, setCouponCode] = useState("");
+  const [couponCode, setCouponCode] = useState(contextCouponCode || "");
   const [couponError, setCouponError] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
 
@@ -88,7 +88,7 @@ export default function CheckoutPage() {
     }
 
     message += `🧾 ORDER DETAILS:\n`;
-    cart.items.forEach((item) => {
+    items.forEach((item) => {
       message += `• ${item.name}\n`;
       message += `  Size: ${item.size} | Color: ${item.color}\n`;
       message += `  Qty: ${item.quantity} × ₦${item.price} = ₦${item.quantity * item.price}\n\n`;

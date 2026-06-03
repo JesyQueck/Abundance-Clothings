@@ -6,18 +6,47 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { formatPrice, getStockStatusColor } from "@/lib/utils";
+import { formatPrice, getStockStatusColor, getStockStatus } from "@/lib/utils";
 import { Tag } from "@/components/ui/Tag";
 import { Heart, X } from "lucide-react";
+import { Product } from "@/types";
+import { getProductById } from "@/lib/db";
+import { useEffect, useState } from "react";
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist } = useWishlist();
-  const { addToCart } = useCart();
+  const { items, removeItem: removeFromWishlist } = useWishlist();
+  const { addItem: addToCart } = useCart();
+  const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (wishlist.length === 0) {
+  useEffect(() => {
+    const loadWishlistProducts = async () => {
+      setLoading(true);
+      const productPromises = items.map((id) => getProductById(id));
+      const products = (await Promise.all(productPromises)).filter(
+        Boolean,
+      ) as Product[];
+      setWishlistProducts(products);
+      setLoading(false);
+    };
+
+    loadWishlistProducts();
+  }, [items]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-text-secondary">Loading wishlist...</p>
+      </div>
+    );
+  }
+
+  if (wishlistProducts.length === 0) {
     return (
       <div className="container mx-auto px-4 py-16 text-center text-gold-primary">
-        <h1 className="text-4xl font-bebas-neue mb-4">Your Wishlist is Empty</h1>
+        <h1 className="text-4xl font-bebas-neue mb-4">
+          Your Wishlist is Empty
+        </h1>
         <p className="text-lg text-text-secondary mb-8">
           Save your favorite items here to easily find them later.
         </p>
@@ -30,16 +59,24 @@ export default function WishlistPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bebas-neue text-gold-primary mb-8 text-center">Your Wishlist</h1>
+      <h1 className="text-4xl font-bebas-neue text-gold-primary mb-8 text-center">
+        Your Wishlist
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {wishlist.map((product) => (
+        {wishlistProducts.map((product) => (
           <Card key={product.id}>
             <div className="relative w-full h-60 mb-4">
-              <Image src={product.images[0]} alt={product.name} fill style={{ objectFit: "cover" }} className="rounded-md" />
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                style={{ objectFit: "cover" }}
+                className="rounded-md"
+              />
               <Button
-                variant="icon"
-                size="small"
+                variant="outline"
+                size="sm"
                 className="absolute top-2 right-2 bg-background-surface rounded-full"
                 onClick={() => removeFromWishlist(product.id)}
               >
@@ -55,25 +92,35 @@ export default function WishlistPage() {
               ₦{formatPrice(product.price)}
             </p>
             <div className="flex flex-wrap gap-1 mb-4">
-              {product.variants.map(variant => variant.size).filter((value, index, self) => self.indexOf(value) === index).map(size => (
-                <Tag key={size}>{size}</Tag>
-              ))}
+              {product.variants
+                .map((variant) => variant.size)
+                .filter((value, index, self) => self.indexOf(value) === index)
+                .map((size) => (
+                  <Tag key={size}>{size}</Tag>
+                ))}
             </div>
             <div className="flex justify-between items-center">
-              <span className={`text-xs font-mono uppercase ${getStockStatusColor(product)}`}>
-                {product.variants.reduce((sum, v) => sum + v.stock, 0) > 0 ? "In Stock" : "Out of Stock"}
+              <span
+                className={`text-xs font-mono uppercase ${getStockStatusColor(getStockStatus(product.variants.reduce((sum, v) => sum + v.stock, 0)))}`}
+              >
+                {product.variants.reduce((sum, v) => sum + v.stock, 0) > 0
+                  ? "In Stock"
+                  : "Out of Stock"}
               </span>
               <Button
                 variant="primary"
-                size="small"
+                size="sm"
                 onClick={() => {
-                  // For simplicity, add the first available variant to cart
-                  const firstVariant = product.variants.find(v => v.stock > 0);
-                  if (firstVariant) {
-                    addToCart({ ...product, selectedSize: firstVariant.size, selectedColor: firstVariant.color, quantity: 1 });
+                  const firstAvailableVariant = product.variants.find(
+                    (v) => v.stock > 0,
+                  );
+                  if (firstAvailableVariant) {
+                    addToCart(product, firstAvailableVariant, 1);
                   }
                 }}
-                disabled={product.variants.reduce((sum, v) => sum + v.stock, 0) === 0}
+                disabled={
+                  product.variants.reduce((sum, v) => sum + v.stock, 0) === 0
+                }
               >
                 Add to Cart
               </Button>
