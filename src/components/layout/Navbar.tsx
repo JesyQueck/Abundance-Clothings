@@ -23,8 +23,7 @@ export function Navbar() {
           <Link href="/" className="flex-shrink-0">
             <div className="font-display text-2xl tracking-widest">
               <span className="text-gold-primary">ABUNDANCE</span>
-              <br />
-              <span className="text-text-primary text-lg">CLOTHING</span>
+              <span className="text-text-primary text-lg ml-2">CLOTHING</span>
             </div>
           </Link>
 
@@ -43,12 +42,12 @@ export function Navbar() {
 
           {/* Icons */}
           <div className="flex items-center space-x-4">
-            <button
+           {/*  <button
               onClick={() => setSearchOpen(!searchOpen)}
               className="text-text-secondary hover:text-gold-primary transition-colors"
             >
               <Search size={20} />
-            </button>
+            </button> */}
             <Link href="/wishlist" className="relative text-text-secondary hover:text-gold-primary transition-colors">
               <Heart size={20} />
               {wishlistCount > 0 && (

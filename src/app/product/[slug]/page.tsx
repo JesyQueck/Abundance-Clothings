@@ -216,10 +216,10 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Actions */}
-            <div className="flex gap-4 mb-8">
+            <div className="flex gap-4 mb-8 items-center">
               <Button
                 size="lg"
-                className="flex-1"
+                className="flex-1 h-14 flex items-center justify-center"
                 onClick={handleAddToCart}
                 disabled={!selectedVariant || selectedVariant.stock === 0}
               >
@@ -228,7 +228,7 @@ export default function ProductDetailPage() {
               </Button>
               <button
                 onClick={handleAddToWishlist}
-                className={`w-14 h-14 border flex items-center justify-center transition-colors ${
+                className={`w-14 h-14 border flex items-center justify-center transition-colors shrink-0 ${
                   isInWishlist(product.id)
                     ? "border-gold-primary bg-gold-primary text-background-deep"
                     : "border-border-subtle bg-background-raised text-text-primary hover:border-gold-primary"
