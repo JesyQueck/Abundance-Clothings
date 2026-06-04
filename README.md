@@ -195,6 +195,10 @@ CREATE POLICY "Admin access to orders" ON orders FOR ALL USING (true);
 
 ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Admin access to order items" ON order_items FOR ALL USING (true);
+
+-- Required for admin product CRUD (see supabase/admin-products-rls.sql)
+CREATE POLICY "Allow product writes" ON products FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow product variant writes" ON product_variants FOR ALL USING (true) WITH CHECK (true);
 ```
 
 4. Enable Realtime for the following tables in your Supabase dashboard:

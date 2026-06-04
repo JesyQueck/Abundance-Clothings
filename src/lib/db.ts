@@ -1,4 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
+import { MOCK_FEATURED_PRODUCTS } from "@/lib/mockProducts";
+import { productToDbRow } from "@/lib/productUtils";
 import {
   Product,
   Coupon,
@@ -127,19 +129,27 @@ export async function getProductById(id: string): Promise<Product | null> {
   return data ? transformProduct(data) : null;
 }
 
-export async function getFeaturedProducts(): Promise<Product[]> {
+export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select("*, product_variants(*)")
     .eq("featured", true)
     .eq("published", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(limit);
 
   if (error) {
     console.error("Error fetching featured products:", error);
     return [];
   }
   return data.map(transformProduct);
+}
+
+/** Featured products for homepage; falls back to 3 mock items when DB is empty. */
+export async function getFeaturedProductsForHome(): Promise<Product[]> {
+  const products = await getFeaturedProducts(4);
+  if (products.length > 0) return products;
+  return MOCK_FEATURED_PRODUCTS.slice(0, 3);
 }
 
 export async function getProductsByCategory(
@@ -190,11 +200,34 @@ export async function getAllProducts(): Promise<Product[]> {
   return data.map(transformProduct);
 }
 
-export async function addProduct(product: Product): Promise<void> {
-  const { variants, ...productData } = product;
+async function insertProductVariants(
+  productId: string,
+  variants: ProductVariant[],
+): Promise<void> {
+  if (variants.length === 0) return;
+  const variantsToInsert = variants.map((v) => ({
+    size: v.size,
+    color: v.color,
+    color_hex: v.colorHex,
+    stock: v.stock,
+    product_id: productId,
+  }));
+  const { error } = await supabase
+    .from("product_variants")
+    .insert(variantsToInsert);
+  if (error) {
+    console.error("Error saving product variants:", error);
+    throw error;
+  }
+}
+
+export async function addProduct(
+  product: Omit<Product, "id" | "createdAt">,
+): Promise<Product> {
+  const { variants, ...fields } = product;
   const { data, error } = await supabase
     .from("products")
-    .insert({ ...productData, created_at: new Date().toISOString() })
+    .insert(productToDbRow(fields))
     .select()
     .single();
 
@@ -203,53 +236,39 @@ export async function addProduct(product: Product): Promise<void> {
     throw error;
   }
 
-  if (data && variants && variants.length > 0) {
-    const variantsToInsert = variants.map((v: ProductVariant) => ({
-      size: v.size,
-      color: v.color,
-      color_hex: v.colorHex,
-      stock: v.stock,
-      product_id: data.id,
-    }));
-    const { error: variantError } = await supabase
-      .from("product_variants")
-      .insert(variantsToInsert);
-    if (variantError) {
-      console.error("Error adding product variants:", variantError);
-      throw variantError;
-    }
-  }
+  await insertProductVariants(data.id, variants);
+  return transformProduct({ ...data, product_variants: variants });
 }
 
 export async function updateProduct(product: Product): Promise<void> {
-  const { variants, ...productData } = product;
+  const { variants, id, createdAt: _createdAt, ...fields } = product;
   const { error } = await supabase
     .from("products")
-    .update({ ...productData, updated_at: new Date().toISOString() })
-    .eq("id", product.id);
+    .update(productToDbRow({ ...fields, slug: product.slug }))
+    .eq("id", id);
 
   if (error) {
     console.error("Error updating product:", error);
     throw error;
   }
 
-  // Update variants: clear existing and insert new ones
-  await supabase.from("product_variants").delete().eq("product_id", product.id);
-  if (variants && variants.length > 0) {
-    const variantsToInsert = variants.map((v: ProductVariant) => ({
-      size: v.size,
-      color: v.color,
-      color_hex: v.colorHex,
-      stock: v.stock,
-      product_id: product.id,
-    }));
-    const { error: variantError } = await supabase
-      .from("product_variants")
-      .insert(variantsToInsert);
-    if (variantError) {
-      console.error("Error updating product variants:", variantError);
-      throw variantError;
-    }
+  await supabase.from("product_variants").delete().eq("product_id", id);
+  await insertProductVariants(id, variants);
+}
+
+export async function updateProductFlags(
+  id: string,
+  flags: { featured?: boolean; published?: boolean },
+): Promise<void> {
+  const row: Record<string, boolean> = {};
+  if (flags.featured !== undefined) row.featured = flags.featured;
+  if (flags.published !== undefined) row.published = flags.published;
+  if (Object.keys(row).length === 0) return;
+
+  const { error } = await supabase.from("products").update(row).eq("id", id);
+  if (error) {
+    console.error("Error updating product flags:", error);
+    throw error;
   }
 }
 

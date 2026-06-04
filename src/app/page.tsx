@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { getFeaturedProducts } from "@/lib/db";
+import { getFeaturedProductsForHome } from "@/lib/db";
+import { isMockProduct } from "@/lib/mockProducts";
+import { formatPrice } from "@/lib/utils";
 
 export default async function HomePage() {
-  const featuredProducts = await getFeaturedProducts();
+  const featuredProducts = await getFeaturedProductsForHome();
+  const usingFallback = featuredProducts.every(isMockProduct);
 
   return (
     <div className="bg-background-deep">
@@ -59,34 +62,53 @@ export default async function HomePage() {
       {/* Featured Products */}
       <section className="py-20 px-4 bg-background-surface">
         <div className="max-w-7xl mx-auto">
-          <h2 className="font-display text-4xl tracking-widest text-center mb-12">
+          <h2 className="font-display text-4xl tracking-widest text-center mb-4">
             <span className="text-gold-primary">FEATURED</span>
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <Link key={product.id} href={`/product/${product.slug}`} className="group">
-                <div className="bg-background-raised border border-border-subtle overflow-hidden">
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
+          {usingFallback && (
+            <p className="text-center text-text-muted text-sm mb-8 max-w-xl mx-auto">
+              Showing sample products — add items in Admin and mark them as featured to
+              replace these.
+            </p>
+          )}
+          {!usingFallback && <div className="mb-8" />}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredProducts.map((product) => {
+              const href = isMockProduct(product)
+                ? "/shop"
+                : `/product/${product.slug}`;
+              const displayPrice =
+                product.salePrice != null ? product.salePrice : product.price;
+              return (
+                <Link key={product.id} href={href} className="group">
+                  <div className="bg-background-raised border border-border-subtle overflow-hidden">
+                    <div className="aspect-square overflow-hidden">
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-display text-lg tracking-wider text-text-primary mb-2">
+                        {product.name}
+                      </h3>
+                      <p className="text-text-secondary text-sm mb-3">
+                        {product.salePrice != null && (
+                          <span className="line-through text-text-muted mr-2">
+                            {formatPrice(product.price)}
+                          </span>
+                        )}
+                        {formatPrice(displayPrice)}
+                      </p>
+                      <Button variant="outline" size="sm" className="w-full">
+                        {isMockProduct(product) ? "Shop Now" : "View Details"}
+                      </Button>
+                    </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-display text-lg tracking-wider text-text-primary mb-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-text-secondary text-sm mb-3">
-                      ₦{product.price.toLocaleString()}
-                    </p>
-                    <Button variant="outline" size="sm" className="w-full">
-                      View Details
-                    </Button>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
           <div className="text-center mt-12">
             <Link href="/shop">
