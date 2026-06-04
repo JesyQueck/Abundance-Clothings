@@ -6,7 +6,6 @@ import { formatPrice } from "@/lib/utils";
 
 export default async function HomePage() {
   const featuredProducts = await getFeaturedProductsForHome();
-  const usingFallback = featuredProducts.every(isMockProduct);
 
   return (
     <div className="bg-background-deep">
@@ -62,16 +61,13 @@ export default async function HomePage() {
       {/* Featured Products */}
       <section className="py-20 px-4 bg-background-surface">
         <div className="max-w-7xl mx-auto">
-          <h2 className="font-display text-4xl tracking-widest text-center mb-4">
+          <h2 className="font-display text-4xl tracking-widest text-center mb-3">
             <span className="text-gold-primary">FEATURED</span>
           </h2>
-          {usingFallback && (
-            <p className="text-center text-text-muted text-sm mb-8 max-w-xl mx-auto">
-              Showing sample products — add items in Admin and mark them as featured to
-              replace these.
-            </p>
-          )}
-          {!usingFallback && <div className="mb-8" />}
+          <p className="text-center text-text-secondary text-base md:text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
+            Handpicked pieces from our latest drop — premium streetwear built to
+            move with you.
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredProducts.map((product) => {
               const href = isMockProduct(product)
@@ -102,7 +98,7 @@ export default async function HomePage() {
                         {formatPrice(displayPrice)}
                       </p>
                       <Button variant="outline" size="sm" className="w-full">
-                        {isMockProduct(product) ? "Shop Now" : "View Details"}
+                        View Details
                       </Button>
                     </div>
                   </div>

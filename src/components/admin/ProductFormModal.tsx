@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import {
-  parseCommaList,
-  parseLines,
-  slugify,
-} from "@/lib/productUtils";
+  ProductImageUpload,
+  ProductImageItem,
+} from "@/components/admin/ProductImageUpload";
+import { parseCommaList, parseLines, slugify } from "@/lib/productUtils";
+import { uploadProductImages } from "@/lib/storage";
 import { Category, Product, ProductVariant, Size } from "@/types";
 
 const SIZES: Size[] = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -19,6 +20,9 @@ const emptyVariant = (): ProductVariant => ({
   colorHex: "#0D0B09",
   stock: 10,
 });
+
+const inputClass =
+  "w-full px-3 py-2 bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none";
 
 export type ProductFormValues = Omit<Product, "id" | "createdAt">;
 
@@ -36,6 +40,7 @@ export function ProductFormModal({
   initial,
 }: ProductFormModalProps) {
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugManual, setSlugManual] = useState(false);
@@ -44,7 +49,7 @@ export function ProductFormModal({
   const [salePrice, setSalePrice] = useState("");
   const [category, setCategory] = useState<Category>("mens");
   const [tags, setTags] = useState("");
-  const [images, setImages] = useState("");
+  const [imageItems, setImageItems] = useState<ProductImageItem[]>([]);
   const [material, setMaterial] = useState("");
   const [care, setCare] = useState("");
   const [featured, setFeatured] = useState(false);
@@ -62,7 +67,12 @@ export function ProductFormModal({
       setSalePrice(initial.salePrice != null ? String(initial.salePrice) : "");
       setCategory(initial.category);
       setTags(initial.tags.join(", "));
-      setImages(initial.images.join(", "));
+      setImageItems(
+        initial.images.map((url) => ({
+          previewUrl: url,
+          isExisting: true,
+        })),
+      );
       setMaterial(initial.material);
       setCare(initial.care.join("\n"));
       setFeatured(initial.featured);
@@ -79,7 +89,7 @@ export function ProductFormModal({
       setSalePrice("");
       setCategory("mens");
       setTags("");
-      setImages("");
+      setImageItems([]);
       setMaterial("");
       setCare("");
       setFeatured(false);
@@ -102,20 +112,40 @@ export function ProductFormModal({
     );
   };
 
+  const resolveImageUrls = async (): Promise<string[]> => {
+    const productSlug = slug.trim() || slugify(name) || "product";
+    const existingUrls = imageItems
+      .filter((item) => !item.file)
+      .map((item) => item.previewUrl);
+    const pendingFiles = imageItems
+      .filter((item): item is ProductImageItem & { file: File } => !!item.file)
+      .map((item) => item.file);
+
+    if (pendingFiles.length === 0) return existingUrls;
+
+    setUploading(true);
+    try {
+      const uploaded = await uploadProductImages(pendingFiles, productSlug);
+      return [...existingUrls, ...uploaded];
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !slug.trim() || !price) {
       alert("Name, slug, and price are required.");
       return;
     }
-    const imageList = parseCommaList(images);
-    if (imageList.length === 0) {
-      alert("Add at least one image URL.");
+    if (imageItems.length === 0) {
+      alert("Add at least one product image.");
       return;
     }
 
     setSaving(true);
     try {
+      const images = await resolveImageUrls();
       await onSave({
         slug: slug.trim(),
         name: name.trim(),
@@ -124,7 +154,7 @@ export function ProductFormModal({
         salePrice: salePrice ? Number(salePrice) : undefined,
         category,
         tags: parseCommaList(tags),
-        images: imageList,
+        images,
         material: material.trim(),
         care: parseLines(care),
         featured,
@@ -132,24 +162,61 @@ export function ProductFormModal({
         variants,
       });
       onClose();
-    } catch {
-      alert("Failed to save product. Check Supabase RLS policies allow writes.");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to save product.";
+      alert(
+        `${message}\n\nIf uploads fail, run supabase/storage-product-images.sql in your Supabase project.`,
+      );
     } finally {
       setSaving(false);
     }
   };
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="p-6 space-y-4">
-        <h2 className="font-display text-2xl tracking-widest text-text-primary pr-8">
-          {initial ? "Edit Product" : "Add Product"}
-        </h2>
+  const busy = saving || uploading;
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="lg"
+      title={initial ? "Edit Product" : "Add Product"}
+      footer={
+        <div className="flex gap-3">
+          <Button
+            type="submit"
+            form="product-form"
+            variant="primary"
+            className="flex-1"
+            disabled={busy}
+          >
+            {uploading
+              ? "Uploading images…"
+              : saving
+                ? "Saving…"
+                : initial
+                  ? "Update Product"
+                  : "Create Product"}
+          </Button>
+          <Button type="button" variant="outline" onClick={onClose} disabled={busy}>
+            Cancel
+          </Button>
+        </div>
+      }
+    >
+      <form id="product-form" onSubmit={handleSubmit} className="space-y-5">
+        <Field label="Product images">
+          <ProductImageUpload
+            images={imageItems}
+            onChange={setImageItems}
+            disabled={busy}
+          />
+        </Field>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Name">
             <input
-              className="w-full px-3 py-2 bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
+              className={inputClass}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -157,7 +224,7 @@ export function ProductFormModal({
           </Field>
           <Field label="Slug">
             <input
-              className="w-full px-3 py-2 bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
+              className={inputClass}
               value={slug}
               onChange={(e) => {
                 setSlugManual(true);
@@ -170,7 +237,7 @@ export function ProductFormModal({
             <input
               type="number"
               min={0}
-              className="w-full px-3 py-2 bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
+              className={inputClass}
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               required
@@ -180,14 +247,14 @@ export function ProductFormModal({
             <input
               type="number"
               min={0}
-              className="w-full px-3 py-2 bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
+              className={inputClass}
               value={salePrice}
               onChange={(e) => setSalePrice(e.target.value)}
             />
           </Field>
           <Field label="Category">
             <select
-              className="w-full px-3 py-2 bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
+              className={inputClass}
               value={category}
               onChange={(e) => setCategory(e.target.value as Category)}
             >
@@ -200,7 +267,7 @@ export function ProductFormModal({
           </Field>
           <Field label="Material">
             <input
-              className="w-full px-3 py-2 bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
+              className={inputClass}
               value={material}
               onChange={(e) => setMaterial(e.target.value)}
             />
@@ -209,24 +276,15 @@ export function ProductFormModal({
 
         <Field label="Description">
           <textarea
-            className="w-full px-3 py-2 min-h-[80px] bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
+            className={`${inputClass} min-h-[80px]`}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
         </Field>
 
-        <Field label="Image URLs (comma-separated)">
-          <input
-            className="w-full px-3 py-2 bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
-            value={images}
-            onChange={(e) => setImages(e.target.value)}
-            placeholder="https://..."
-          />
-        </Field>
-
         <Field label="Tags (comma-separated)">
           <input
-            className="w-full px-3 py-2 bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
+            className={inputClass}
             value={tags}
             onChange={(e) => setTags(e.target.value)}
           />
@@ -234,13 +292,13 @@ export function ProductFormModal({
 
         <Field label="Care instructions (one per line)">
           <textarea
-            className="w-full px-3 py-2 min-h-[60px] bg-background-raised border border-border-subtle text-text-primary text-sm focus:border-gold-primary focus:outline-none"
+            className={`${inputClass} min-h-[60px]`}
             value={care}
             onChange={(e) => setCare(e.target.value)}
           />
         </Field>
 
-        <div className="flex gap-6">
+        <div className="flex flex-wrap gap-6">
           <label className="inline-flex items-center gap-2 text-sm text-text-secondary">
             <input
               type="checkbox"
@@ -259,25 +317,27 @@ export function ProductFormModal({
           </label>
         </div>
 
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-mono text-text-secondary">Variants</span>
+        <div className="border-t border-border-subtle pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-mono text-text-secondary uppercase tracking-wider">
+              Variants
+            </span>
             <button
               type="button"
-              className="text-xs text-gold-primary"
+              className="text-xs text-gold-primary hover:underline"
               onClick={() => setVariants((v) => [...v, emptyVariant()])}
             >
               + Add variant
             </button>
           </div>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
+          <div className="space-y-2">
             {variants.map((v, i) => (
               <div
                 key={i}
-                className="grid grid-cols-5 gap-2 items-center border border-border-subtle p-2"
+                className="grid grid-cols-2 sm:grid-cols-5 gap-2 items-center border border-border-subtle p-3 bg-background-raised/50"
               >
                 <select
-                  className="w-full px-2 py-1 bg-background-raised border border-border-subtle text-text-primary text-xs focus:border-gold-primary focus:outline-none"
+                  className={`${inputClass} text-xs`}
                   value={v.size}
                   onChange={(e) =>
                     updateVariant(i, "size", e.target.value as Size)
@@ -290,13 +350,13 @@ export function ProductFormModal({
                   ))}
                 </select>
                 <input
-                  className="w-full px-2 py-1 bg-background-raised border border-border-subtle text-text-primary text-xs focus:border-gold-primary focus:outline-none"
+                  className={`${inputClass} text-xs`}
                   placeholder="Color"
                   value={v.color}
                   onChange={(e) => updateVariant(i, "color", e.target.value)}
                 />
                 <input
-                  className="w-full px-2 py-1 bg-background-raised border border-border-subtle text-text-primary text-xs focus:border-gold-primary focus:outline-none"
+                  className={`${inputClass} text-xs`}
                   placeholder="#hex"
                   value={v.colorHex}
                   onChange={(e) => updateVariant(i, "colorHex", e.target.value)}
@@ -304,7 +364,7 @@ export function ProductFormModal({
                 <input
                   type="number"
                   min={0}
-                  className="w-full px-2 py-1 bg-background-raised border border-border-subtle text-text-primary text-xs focus:border-gold-primary focus:outline-none"
+                  className={`${inputClass} text-xs`}
                   placeholder="Stock"
                   value={v.stock}
                   onChange={(e) =>
@@ -313,7 +373,7 @@ export function ProductFormModal({
                 />
                 <button
                   type="button"
-                  className="text-xs text-red-400"
+                  className="text-xs text-red-400 hover:underline justify-self-start sm:justify-self-center"
                   onClick={() =>
                     setVariants((prev) =>
                       prev.length > 1 ? prev.filter((_, j) => j !== i) : prev,
@@ -325,15 +385,6 @@ export function ProductFormModal({
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="flex gap-3 pt-2">
-          <Button type="submit" variant="primary" className="flex-1" disabled={saving}>
-            {saving ? "Saving…" : initial ? "Update Product" : "Create Product"}
-          </Button>
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
         </div>
       </form>
     </Modal>
@@ -349,7 +400,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-sm font-mono text-text-secondary mb-1">
+      <label className="block text-sm font-mono text-text-secondary mb-1.5 uppercase tracking-wide">
         {label}
       </label>
       {children}
