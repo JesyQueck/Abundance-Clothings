@@ -4,16 +4,18 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useHydrated } from "@/hooks/useHydrated";
 import { ShoppingBag, Heart, Menu, X, Search } from "lucide-react";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const hydrated = useHydrated();
   const { getItemCount } = useCart();
   const { getItemCount: getWishlistCount } = useWishlist();
 
-  const cartCount = getItemCount();
-  const wishlistCount = getWishlistCount();
+  const cartCount = hydrated ? getItemCount() : 0;
+  const wishlistCount = hydrated ? getWishlistCount() : 0;
 
   // close on escape
   useEffect(() => {

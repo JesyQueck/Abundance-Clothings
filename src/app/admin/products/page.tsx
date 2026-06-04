@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   ProductFormModal,
   ProductFormValues,
@@ -19,8 +18,6 @@ import { formatPrice } from "@/lib/utils";
 import { Product } from "@/types";
 
 export default function AdminProductsPage() {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -34,14 +31,8 @@ export default function AdminProductsPage() {
   }, []);
 
   useEffect(() => {
-    const auth = localStorage.getItem("abundance_admin_auth");
-    if (auth !== "true") {
-      router.push("/admin-login");
-    } else {
-      setIsAuthenticated(true);
-      loadProducts();
-    }
-  }, [router, loadProducts]);
+    loadProducts();
+  }, [loadProducts]);
 
   const totalStock = (p: Product) =>
     p.variants?.reduce((sum, v) => sum + (v.stock ?? 0), 0) ?? 0;
@@ -82,8 +73,6 @@ export default function AdminProductsPage() {
       alert("Failed to update published status.");
     }
   };
-
-  if (!isAuthenticated) return null;
 
   return (
     <div className="container mx-auto px-4 py-8 text-text-secondary">

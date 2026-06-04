@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { SectionTitle, SubTitle, Badge } from "@/components/ui/PRDComponents";
@@ -20,22 +19,14 @@ const OrderStatusColors: Record<OrderStatus, "default" | "gold" | "green" | "red
 };
 
 const AdminOrdersPage = () => {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    const auth = localStorage.getItem("abundance_admin_auth");
-    if (auth !== "true") {
-      router.push("/admin-login");
-    } else {
-      setIsAuthenticated(true);
-      fetchOrders();
-    }
-  }, [router]);
+    fetchOrders();
+  }, []);
 
   const fetchOrders = async () => {
     setOrders(await getOrders());
@@ -67,10 +58,6 @@ const AdminOrdersPage = () => {
     setSelectedOrder(order);
     setModalOpen(true);
   };
-
-  if (!isAuthenticated) {
-    return null; // Or a loading spinner
-  }
 
   return (
     <div className="container mx-auto px-4 py-8 text-text-secondary">

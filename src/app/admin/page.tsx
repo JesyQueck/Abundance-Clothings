@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -15,31 +14,19 @@ import { getProducts, getOrders, getCoupons } from "@/lib/db";
 import { Product, Order, Coupon } from "@/types";
 
 const AdminDashboardPage = () => {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
 
   useEffect(() => {
-    const auth = localStorage.getItem("abundance_admin_auth");
-    if (auth !== "true") {
-      router.push("/admin-login");
-    } else {
-      setIsAuthenticated(true);
-      fetchData();
-    }
-  }, [router]);
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     setProducts(await getProducts());
     setOrders(await getOrders());
     setCoupons(await getCoupons());
   };
-
-  if (!isAuthenticated) {
-    return null; // Or a loading spinner
-  }
 
   const totalProducts = products.length;
   const totalOrders = orders.length;

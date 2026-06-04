@@ -197,6 +197,14 @@ export default function CheckoutPage() {
               id="orderNotes"
               {...register("orderNotes")}
             />
+            <Button
+              variant="primary"
+              size="md"
+              className="w-full"
+              type="submit"
+            >
+              Send Order on WhatsApp →
+            </Button>
           </form>
         </div>
 
@@ -225,11 +233,11 @@ export default function CheckoutPage() {
                     {item.size} / {item.color}
                   </p>
                   <p className="text-gold-primary text-sm">
-                    {item.quantity} x ₦{formatPrice(item.price)}
+                    {item.quantity} x {formatPrice(item.price)}
                   </p>
                 </div>
                 <span className="text-text-primary font-mono text-lg">
-                  ₦{formatPrice(item.quantity * item.price)}
+                  {formatPrice(item.quantity * item.price)}
                 </span>
               </div>
             ))}
@@ -240,7 +248,7 @@ export default function CheckoutPage() {
                   Subtotal ({getItemCount()} items)
                 </span>
                 <span className="text-text-primary">
-                  ₦{formatPrice(subtotal)}
+                  {formatPrice(subtotal)}
                 </span>
               </div>
               {couponCode && (
@@ -294,14 +302,6 @@ export default function CheckoutPage() {
               few hours."
             </em>
           </p>
-          <Button
-            variant="primary"
-            size="md"
-            className="w-full"
-            onClick={handleSubmit(onSubmit)}
-          >
-            Send Order on WhatsApp →
-          </Button>
         </div>
       </div>
     </div>

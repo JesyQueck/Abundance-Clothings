@@ -14,10 +14,10 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background-deep z-10" />
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=1920')] bg-cover bg-center opacity-30" />
         <div className="relative z-20 text-center px-4">
-          <h1 className="font-display text-6xl md:text-8xl tracking-widest mb-4">
+          <h1 className="font-display text-4xl md:text-6xl lg:text-8xl tracking-widest mb-4">
             <span className="text-gold-primary">ABUNDANCE</span>
           </h1>
-          <p className="font-display text-3xl md:text-4xl tracking-wider text-text-primary mb-8">
+          <p className="font-display text-2xl md:text-3xl lg:text-4xl tracking-wider text-text-primary mb-8">
             Focus. Grow. Flourish.
           </p>
           <Link href="/shop">
@@ -29,29 +29,29 @@ export default async function HomePage() {
       {/* Featured Collections */}
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="font-display text-4xl tracking-widest text-center mb-12">
+          <h2 className="font-display text-2xl md:text-3xl lg:text-4xl tracking-widest text-center mb-12">
             <span className="text-gold-primary">COLLECTIONS</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link href="/shop?category=mens" className="group relative h-96 overflow-hidden">
+            <Link href="/shop?category=mens" className="group relative h-64 md:h-96 overflow-hidden">
               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
               <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors" />
               <div className="relative z-10 h-full flex items-center justify-center">
-                <h3 className="font-display text-3xl tracking-widest text-white">MEN&apos;S WEAR</h3>
+                <h3 className="font-display text-xl md:text-2xl lg:text-3xl tracking-widest text-white">MEN&apos;S WEAR</h3>
               </div>
             </Link>
-            <Link href="/shop?category=womens" className="group relative h-96 overflow-hidden">
+            <Link href="/shop?category=womens" className="group relative h-64 md:h-96 overflow-hidden">
               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
               <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors" />
               <div className="relative z-10 h-full flex items-center justify-center">
-                <h3 className="font-display text-3xl tracking-widest text-white">WOMEN&apos;S WEAR</h3>
+                <h3 className="font-display text-xl md:text-2xl lg:text-3xl tracking-widest text-white">WOMEN&apos;S WEAR</h3>
               </div>
             </Link>
-            <Link href="/shop?category=accessories" className="group relative h-96 overflow-hidden">
+            <Link href="/shop?category=accessories" className="group relative h-64 md:h-96 overflow-hidden">
               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=800')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
               <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors" />
               <div className="relative z-10 h-full flex items-center justify-center">
-                <h3 className="font-display text-3xl tracking-widest text-white">ACCESSORIES</h3>
+                <h3 className="font-display text-xl md:text-2xl lg:text-3xl tracking-widest text-white">ACCESSORIES</h3>
               </div>
             </Link>
           </div>
@@ -61,10 +61,10 @@ export default async function HomePage() {
       {/* Featured Products */}
       <section className="py-20 px-4 bg-background-surface">
         <div className="max-w-7xl mx-auto">
-          <h2 className="font-display text-4xl tracking-widest text-center mb-3">
+          <h2 className="font-display text-2xl md:text-3xl lg:text-4xl tracking-widest text-center mb-3">
             <span className="text-gold-primary">FEATURED</span>
           </h2>
-          <p className="text-center text-text-secondary text-base md:text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
+          <p className="text-center text-text-secondary text-sm md:text-base lg:text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
             Handpicked pieces from our latest drop — premium streetwear built to
             move with you.
           </p>
@@ -86,7 +86,7 @@ export default async function HomePage() {
                       />
                     </div>
                     <div className="p-4">
-                      <h3 className="font-display text-lg tracking-wider text-text-primary mb-2">
+                      <h3 className="font-display text-base md:text-lg tracking-wider text-text-primary mb-2">
                         {product.name}
                       </h3>
                       <p className="text-text-secondary text-sm mb-3">

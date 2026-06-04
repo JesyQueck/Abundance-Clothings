@@ -1,25 +1,41 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { isAdminAuthenticated, setAdminAuthenticated } from "@/lib/adminAuth";
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (isAdminAuthenticated()) {
+      setAdminAuthenticated();
+      const from = searchParams.get("from");
+      const destination =
+        from && from.startsWith("/admin") ? from : "/admin";
+      router.replace(destination);
+    }
+  }, [router, searchParams]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123"; // Default for dev
+    const adminPassword =
+      process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123";
 
     if (password === adminPassword) {
-      localStorage.setItem("abundance_admin_auth", "true");
-      router.push("/admin");
+      setAdminAuthenticated();
+      const from = searchParams.get("from");
+      const destination =
+        from && from.startsWith("/admin") ? from : "/admin";
+      router.replace(destination);
     } else {
       setError("Incorrect password");
     }
@@ -56,5 +72,19 @@ export default function AdminLoginPage() {
         </div>
       </Card>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center text-text-secondary">
+          Loading…
+        </div>
+      }
+    >
+      <AdminLoginForm />
+    </Suspense>
   );
 }

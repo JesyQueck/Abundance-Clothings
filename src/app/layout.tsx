@@ -3,8 +3,7 @@ import { Bebas_Neue, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { AppChrome } from "@/components/layout/AppChrome";
 
 const bebas = Bebas_Neue({
   weight: "400",
@@ -42,9 +41,7 @@ export default function RootLayout({
       <body className="bg-background-deep text-text-primary font-sans antialiased">
         <CartProvider>
           <WishlistProvider>
-            <Navbar />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
+            <AppChrome>{children}</AppChrome>
           </WishlistProvider>
         </CartProvider>
       </body>
