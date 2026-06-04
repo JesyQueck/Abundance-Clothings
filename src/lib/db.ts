@@ -16,8 +16,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Helper to transform Supabase snake_case to camelCase for product variants
 const transformProductVariant = (variant: any): ProductVariant => ({
-  id: variant.id,
-  product_id: variant.product_id,
   size: variant.size,
   color: variant.color,
   colorHex: variant.color_hex,
@@ -41,7 +39,7 @@ const transformProduct = (product: any): Product => ({
   published: product.published,
   createdAt: product.created_at,
   variants: product.product_variants
-    ? product.product_variants.map(transformProductVariant)
+    ? product.product_variants.map((v: any) => transformProductVariant(v))
     : [],
 });
 
@@ -193,7 +191,7 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 export async function addProduct(product: Product): Promise<void> {
-  const { product_variants, ...productData } = product;
+  const { variants, ...productData } = product;
   const { data, error } = await supabase
     .from("products")
     .insert({ ...productData, created_at: new Date().toISOString() })
@@ -205,11 +203,13 @@ export async function addProduct(product: Product): Promise<void> {
     throw error;
   }
 
-  if (data && product_variants && product_variants.length > 0) {
-    const variantsToInsert = product_variants.map((v) => ({
-      ...v,
-      product_id: data.id,
+  if (data && variants && variants.length > 0) {
+    const variantsToInsert = variants.map((v: ProductVariant) => ({
+      size: v.size,
+      color: v.color,
       color_hex: v.colorHex,
+      stock: v.stock,
+      product_id: data.id,
     }));
     const { error: variantError } = await supabase
       .from("product_variants")
@@ -222,7 +222,7 @@ export async function addProduct(product: Product): Promise<void> {
 }
 
 export async function updateProduct(product: Product): Promise<void> {
-  const { product_variants, ...productData } = product;
+  const { variants, ...productData } = product;
   const { error } = await supabase
     .from("products")
     .update({ ...productData, updated_at: new Date().toISOString() })
@@ -235,11 +235,13 @@ export async function updateProduct(product: Product): Promise<void> {
 
   // Update variants: clear existing and insert new ones
   await supabase.from("product_variants").delete().eq("product_id", product.id);
-  if (product_variants && product_variants.length > 0) {
-    const variantsToInsert = product_variants.map((v) => ({
-      ...v,
-      product_id: product.id,
+  if (variants && variants.length > 0) {
+    const variantsToInsert = variants.map((v: ProductVariant) => ({
+      size: v.size,
+      color: v.color,
       color_hex: v.colorHex,
+      stock: v.stock,
+      product_id: product.id,
     }));
     const { error: variantError } = await supabase
       .from("product_variants")

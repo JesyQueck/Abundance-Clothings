@@ -1,6 +1,11 @@
 import React from "react";
 
-export const Tag = ({ children, color = "#C8A84B" }) => (
+interface TagProps {
+  children: React.ReactNode;
+  color?: string;
+}
+
+export const Tag = ({ children, color = "#C8A84B" }: TagProps) => (
   <span
     style={{
       display: "inline-block",
@@ -19,7 +24,11 @@ export const Tag = ({ children, color = "#C8A84B" }) => (
   </span>
 );
 
-export const SectionTitle = ({ children }) => (
+interface SectionTitleProps {
+  children: React.ReactNode;
+}
+
+export const SectionTitle = ({ children }: SectionTitleProps) => (
   <h2
     style={{
       fontFamily: "'Bebas Neue', 'Arial Black', sans-serif",
@@ -34,7 +43,11 @@ export const SectionTitle = ({ children }) => (
   </h2>
 );
 
-export const SubTitle = ({ children }) => (
+interface SubTitleProps {
+  children: React.ReactNode;
+}
+
+export const SubTitle = ({ children }: SubTitleProps) => (
   <h3
     style={{
       fontFamily: "'Bebas Neue', 'Arial Black', sans-serif",
@@ -61,7 +74,12 @@ export const Divider = () => (
   />
 );
 
-export const Card = ({ children, accent = false }) => (
+interface CardProps {
+  children: React.ReactNode;
+  accent?: boolean;
+}
+
+export const Card = ({ children, accent = false }: CardProps) => (
   <div
     style={{
       background: accent ? "rgba(200,168,75,0.07)" : "#1a1714",
@@ -75,7 +93,12 @@ export const Card = ({ children, accent = false }) => (
   </div>
 );
 
-export const Row = ({ label, value }) => (
+interface RowProps {
+  label: string;
+  value: string;
+}
+
+export const Row = ({ label, value }: RowProps) => (
   <div
     style={{
       display: "flex",
@@ -93,14 +116,25 @@ export const Row = ({ label, value }) => (
   </div>
 );
 
-export const Bullet = ({ children }) => (
+interface BulletProps {
+  children: React.ReactNode;
+}
+
+export const Bullet = ({ children }: BulletProps) => (
   <div style={{ display: "flex", gap: "10px", marginBottom: "8px" }}>
     <span style={{ color: "#C8A84B", flexShrink: 0, fontFamily: "monospace" }}>▸</span>
     <span style={{ color: "#b0a898", fontSize: "13px", lineHeight: "1.6" }}>{children}</span>
   </div>
 );
 
-export const Badge = ({ children, type = "default" }) => {
+type BadgeType = "default" | "gold" | "green" | "red" | "blue";
+
+interface BadgeProps {
+  children: React.ReactNode;
+  type?: BadgeType;
+}
+
+export const Badge = ({ children, type = "default" }: BadgeProps) => {
   const colors = {
     default: { bg: "#1a1714", border: "#2a2520", text: "#888" },
     gold: { bg: "rgba(200,168,75,0.12)", border: "#C8A84B", text: "#C8A84B" },

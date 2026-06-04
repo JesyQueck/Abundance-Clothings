@@ -11,7 +11,7 @@ import { formatPrice } from "@/lib/utils";
 import { Eye, Edit, Save, X } from "lucide-react";
 import Image from "next/image";
 
-const OrderStatusColors: Record<OrderStatus, string> = {
+const OrderStatusColors: Record<OrderStatus, "default" | "gold" | "green" | "red" | "blue"> = {
   Received: "blue",
   Processing: "gold",
   Packed: "gold",
