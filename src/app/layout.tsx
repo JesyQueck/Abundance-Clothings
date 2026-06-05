@@ -38,6 +38,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${bebas.variable} ${dmSans.variable} ${jetbrains.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className="bg-background-deep text-text-primary font-sans antialiased">
         <CartProvider>
           <WishlistProvider>
