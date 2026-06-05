@@ -17,6 +17,18 @@ export function Navbar() {
   const cartCount = hydrated ? getItemCount() : 0;
   const wishlistCount = hydrated ? getWishlistCount() : 0;
 
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   // close on escape
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -98,34 +110,75 @@ export function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-40">
+        <div className="fixed inset-0 z-50 md:hidden">
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/60"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 top-0 w-64 h-full bg-background-surface border-l border-border-subtle p-4">
-            <div className="flex flex-col gap-4">
+          <div className="absolute right-0 top-0 w-80 h-full bg-background-surface border-l border-border-subtle p-6 overflow-y-auto">
+            <div className="flex justify-between items-center mb-8">
+              <div className="font-display text-lg tracking-widest">
+                <span className="text-gold-primary">ABUNDANCE</span>
+                <span className="text-text-primary text-sm ml-2">CLOTHING</span>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-text-primary hover:text-gold-primary transition-colors p-2"
+                aria-label="Close menu"
+              >
+                <X size={28} />
+              </button>
+            </div>
+            <div className="flex flex-col gap-8">
               <Link
                 href="/shop"
                 onClick={() => setIsOpen(false)}
-                className="text-text-secondary hover:text-gold-primary uppercase tracking-wider"
+                className="text-text-primary hover:text-gold-primary text-xl uppercase tracking-wider font-display py-2 border-b border-border-subtle"
               >
                 Shop
               </Link>
               <Link
                 href="/about"
                 onClick={() => setIsOpen(false)}
-                className="text-text-secondary hover:text-gold-primary uppercase tracking-wider"
+                className="text-text-primary hover:text-gold-primary text-xl uppercase tracking-wider font-display py-2 border-b border-border-subtle"
               >
                 About
               </Link>
               <Link
                 href="/contact"
                 onClick={() => setIsOpen(false)}
-                className="text-text-secondary hover:text-gold-primary uppercase tracking-wider"
+                className="text-text-primary hover:text-gold-primary text-xl uppercase tracking-wider font-display py-2 border-b border-border-subtle"
               >
                 Contact
               </Link>
+              <div className="pt-8 mt-8 border-t border-border-subtle">
+                <Link
+                  href="/wishlist"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 text-text-primary hover:text-gold-primary py-3"
+                >
+                  <Heart size={20} />
+                  <span>Wishlist</span>
+                  {wishlistCount > 0 && (
+                    <span className="bg-gold-primary text-background-deep text-xs px-2 py-1 rounded-full">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+                <Link
+                  href="/cart"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 text-text-primary hover:text-gold-primary py-3"
+                >
+                  <ShoppingBag size={20} />
+                  <span>Cart</span>
+                  {cartCount > 0 && (
+                    <span className="bg-gold-primary text-background-deep text-xs px-2 py-1 rounded-full">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+              </div>
             </div>
           </div>
         </div>

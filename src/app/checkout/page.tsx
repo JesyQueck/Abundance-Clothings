@@ -210,7 +210,7 @@ export default function CheckoutPage() {
 
         {/* Order Summary */}
         <div>
-          <h2 className="text-2xl font-bebas-neue text-text-primary mb-6 border-b border-border-subtle pb-2">
+          <h2 className="text-xl md:text-2xl font-bebas-neue text-text-primary mb-6 border-b border-border-subtle pb-2">
             Order Summary
           </h2>
           <Card accent>
@@ -219,7 +219,7 @@ export default function CheckoutPage() {
                 key={`${item.productId}-${item.size}-${item.color}`}
                 className="flex items-center mb-4 last:mb-0"
               >
-                <div className="w-20 h-20 relative mr-4 flex-shrink-0">
+                <div className="w-16 h-16 md:w-20 md:h-20 relative mr-4 flex-shrink-0">
                   <Image
                     src={item.image}
                     alt={item.name}
@@ -228,21 +228,21 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-text-primary text-lg">{item.name}</h3>
-                  <p className="text-text-secondary text-sm">
+                  <h3 className="text-text-primary text-sm md:text-lg">{item.name}</h3>
+                  <p className="text-text-secondary text-xs md:text-sm">
                     {item.size} / {item.color}
                   </p>
-                  <p className="text-gold-primary text-sm">
+                  <p className="text-gold-primary text-xs md:text-sm">
                     {item.quantity} x {formatPrice(item.price)}
                   </p>
                 </div>
-                <span className="text-text-primary font-mono text-lg">
+                <span className="text-text-primary font-mono text-sm md:text-lg">
                   {formatPrice(item.quantity * item.price)}
                 </span>
               </div>
             ))}
 
-            <div className="border-t border-border-subtle mt-4 pt-4 text-sm font-mono space-y-2">
+            <div className="border-t border-border-subtle mt-4 pt-4 text-xs md:text-sm font-mono space-y-2">
               <div className="flex justify-between">
                 <span className="text-text-secondary">
                   Subtotal ({getItemCount()} items)
@@ -264,7 +264,7 @@ export default function CheckoutPage() {
                   </Button>
                 </div>
               )}
-              <div className="flex justify-between text-xl font-bold font-bebas-neue pt-2 border-t border-border-subtle">
+              <div className="flex justify-between text-lg md:text-xl font-bold font-bebas-neue pt-2 border-t border-border-subtle">
                 <span className="text-gold-primary">Total</span>
                 <span className="text-gold-primary">
                   {formatPrice(grandTotal)}
@@ -274,7 +274,7 @@ export default function CheckoutPage() {
           </Card>
 
           <div className="mt-6">
-            <h3 className="text-lg font-bebas-neue text-text-primary mb-3">
+            <h3 className="text-base md:text-lg font-bebas-neue text-text-primary mb-3">
               Apply Coupon
             </h3>
             <div className="flex gap-2">
