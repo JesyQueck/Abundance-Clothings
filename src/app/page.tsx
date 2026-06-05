@@ -34,21 +34,21 @@ export default async function HomePage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link href="/shop?category=mens" className="group relative h-64 md:h-96 overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1714144069905-f9bd839184af?fm=jpg&q=60&w=800&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
               <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors" />
               <div className="relative z-10 h-full flex items-center justify-center">
                 <h3 className="font-display text-xl md:text-2xl lg:text-3xl tracking-widest text-white">MEN&apos;S WEAR</h3>
               </div>
             </Link>
             <Link href="/shop?category=womens" className="group relative h-64 md:h-96 overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620799139507-2a76f79a2f4d?fm=jpg&q=60&w=800&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
               <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors" />
               <div className="relative z-10 h-full flex items-center justify-center">
                 <h3 className="font-display text-xl md:text-2xl lg:text-3xl tracking-widest text-white">WOMEN&apos;S WEAR</h3>
               </div>
             </Link>
             <Link href="/shop?category=accessories" className="group relative h-64 md:h-96 overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=800')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1777558226031-ff5bfd5d7c14?fm=jpg&q=60&w=800&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
               <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors" />
               <div className="relative z-10 h-full flex items-center justify-center">
                 <h3 className="font-display text-xl md:text-2xl lg:text-3xl tracking-widest text-white">ACCESSORIES</h3>
