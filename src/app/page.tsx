@@ -117,13 +117,13 @@ export default async function HomePage() {
       {/* Newsletter */}
       <section className="py-20 px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-display text-4xl tracking-widest mb-4">
+          <h2 className="font-display text-2xl md:text-3xl lg:text-4xl tracking-widest mb-4">
             <span className="text-gold-primary">JOIN THE MOVEMENT</span>
           </h2>
-          <p className="text-text-secondary mb-8">
+          <p className="text-text-secondary text-sm md:text-base mb-8">
             Subscribe for exclusive drops, early access, and special offers.
           </p>
-          <form className="flex gap-4">
+          <form className="flex gap-4 flex-col sm:flex-row">
             <input
               type="email"
               placeholder="Enter your email"

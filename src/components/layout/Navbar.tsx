@@ -32,9 +32,9 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <div className="font-display text-2xl tracking-widest">
+            <div className="font-display text-lg md:text-2xl tracking-widest">
               <span className="text-gold-primary">ABUNDANCE</span>
-              <span className="text-text-primary text-lg ml-2">CLOTHING</span>
+              <span className="text-text-primary text-sm md:text-lg ml-1 md:ml-2">CLOTHING</span>
             </div>
           </Link>
 

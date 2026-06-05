@@ -138,14 +138,14 @@ export default function CheckoutPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bebas-neue text-gold-primary mb-8 text-center">
+      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bebas-neue text-gold-primary mb-8 text-center">
         Checkout
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Checkout Form */}
         <div>
-          <h2 className="text-2xl font-bebas-neue text-text-primary mb-6 border-b border-border-subtle pb-2">
+          <h2 className="text-xl md:text-2xl font-bebas-neue text-text-primary mb-6 border-b border-border-subtle pb-2">
             Your Details
           </h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -254,7 +254,7 @@ export default function CheckoutPage() {
               {couponCode && (
                 <div className="flex justify-between text-gold-primary">
                   <span>Discount ({couponCode})</span>
-                  <span>-₦{formatPrice(discountAmount)}</span>
+                  <span>-{formatPrice(discountAmount)}</span>
                   <Button
                     variant="outline"
                     onClick={removeCoupon}
@@ -267,7 +267,7 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-xl font-bold font-bebas-neue pt-2 border-t border-border-subtle">
                 <span className="text-gold-primary">Total</span>
                 <span className="text-gold-primary">
-                  ₦{formatPrice(grandTotal)}
+                  {formatPrice(grandTotal)}
                 </span>
               </div>
             </div>
