@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fonts are loaded via `next/font/local` from the repo font folder.
+   The local fonts are exposed as CSS variables on the <html> element.
+*/
+
+/* Fonts are loaded via `next/font/local` from the repo font folder.
+   The local fonts are exposed as CSS variables on the <html> element.
+*/
+
 @layer base {
   body {
     @apply bg-background-deep text-text-primary;
